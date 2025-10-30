@@ -33,6 +33,7 @@ import {
   parseFrappeErrorMsg,
 } from "@/lib/utils";
 import MeetingForm from "./meetingForm";
+import MultiStepBooking from "./multiStepBooking";
 import { useAppContext } from "@/context/app";
 import TimeSlotSkeleton from "./timeSlotSkeleton";
 import TimeZoneSelect from "./timeZoneSelectmenu";
@@ -311,9 +312,23 @@ const Booking = ({ type, banner }: BookingProp) => {
                 </div>
               </div>
               <div className="max-lg:w-full shrink-0 lg:max-h-[31rem] md:overflow-hidden">
-                {/* Calendar and Availability slots */}
+                {/* Multi-step booking form */}
                 <AnimatePresence mode="wait">
-                  {!state.showMeetingForm && (
+                  {state.showMeetingForm ? (
+                    <MultiStepBooking
+                      key="multi-step"
+                      durationId={type}
+                      onCancel={() => {
+                        dispatch({
+                          type: "SET_SHOW_MEETING_FORM",
+                          payload: false,
+                        });
+                        dispatch({ type: "SET_EXPANDED", payload: false });
+                        navigate(location.pathname, { replace: true });
+                      }}
+                      isMobileView={state.isMobileView}
+                    />
+                  ) : !state.showMeetingForm && (
                     <motion.div
                       key={1}
                       initial={
@@ -471,16 +486,21 @@ const Booking = ({ type, banner }: BookingProp) => {
                                           type: "SET_SHOW_RESCHEDULE",
                                           payload: true,
                                         });
+                                        setSelectedSlot({
+                                          start_time: slot.start_time,
+                                          end_time: slot.end_time,
+                                        });
                                       } else {
+                                        // Start multi-step booking process
+                                        setSelectedSlot({
+                                          start_time: slot.start_time,
+                                          end_time: slot.end_time,
+                                        });
                                         dispatch({
                                           type: "SET_SHOW_MEETING_FORM",
                                           payload: true,
                                         });
                                       }
-                                      setSelectedSlot({
-                                        start_time: slot.start_time,
-                                        end_time: slot.end_time,
-                                      });
                                     }}
                                     variant="outline"
                                     className={cn(
@@ -518,37 +538,6 @@ const Booking = ({ type, banner }: BookingProp) => {
                         )}
                       </div>
                     </motion.div>
-                  )}
-                  {state.showMeetingForm && (
-                    <MeetingForm
-                      key={2}
-                      onSuccess={(data) => {
-                        dispatch({
-                          type: "SET_SHOW_MEETING_FORM",
-                          payload: false,
-                        });
-                        dispatch({ type: "SET_EXPANDED", payload: false });
-                        mutate();
-                        dispatch({
-                          type: "SET_BOOKING_RESPONSE",
-                          payload: data.message,
-                        });
-                        dispatch({
-                          type: "SET_APPOINTMENT_SCHEDULED",
-                          payload: true,
-                        });
-                      }}
-                      onBack={() => {
-                        dispatch({
-                          type: "SET_SHOW_MEETING_FORM",
-                          payload: false,
-                        });
-                        dispatch({ type: "SET_EXPANDED", payload: false });
-                        mutate();
-                      }}
-                      durationId={type}
-                      isMobileView={state.isMobileView}
-                    />
                   )}
                 </AnimatePresence>
               </div>

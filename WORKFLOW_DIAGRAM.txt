@@ -1,0 +1,177 @@
+FRAPPE APPOINTMENTS - NEW BOOKING WORKFLOW
+==========================================
+
+CUSTOMER BOOKING JOURNEY
+-------------------------
+
+1. Customer Receives URL
+   ↓
+   [https://yoursite.com/schedule/in/username]
+   ↓
+
+2. Select Meeting Duration
+   ┌─────────────────────────────────┐
+   │  Select Meeting Duration         │
+   │  ┌──────┐  ┌──────┐  ┌──────┐  │
+   │  │ 30m  │  │ 60m  │  │ 90m  │  │
+   │  └──────┘  └──────┘  └──────┘  │
+   └─────────────────────────────────┘
+   ↓
+
+═══════════════════════════════════════
+   MULTI-STEP BOOKING PROCESS
+═══════════════════════════════════════
+
+┌──────────────────────────────────────┐
+│ STEP 1: Customer Information         │
+│ ─────────────────────────────────    │
+│                                       │
+│ Customer Name: [_______________] *   │
+│ Phone Number:  [_______________] *   │
+│ Email:         [_______________] *   │
+│                                       │
+│              [Next →]                 │
+└──────────────────────────────────────┘
+   ↓
+
+┌──────────────────────────────────────┐
+│ STEP 2: Select Services               │
+│ ─────────────────────────────────    │
+│                                       │
+│ ┌────────────────────────────────┐  │
+│ │ Service         │ Duration │ ✓ │  │
+│ ├────────────────────────────────┤  │
+│ │ IT Consultation │  60 min  │ ☑ │  │
+│ │ System Setup    │ 120 min  │ ☐ │  │
+│ │ Tech Support    │  90 min  │ ☑ │  │
+│ └────────────────────────────────┘  │
+│                                       │
+│ 2 service(s) selected                 │
+│                                       │
+│  [← Back]           [Next →]          │
+└──────────────────────────────────────┘
+   ↓
+
+┌──────────────────────────────────────┐
+│ STEP 3: Meeting Location              │
+│ ─────────────────────────────────    │
+│                                       │
+│ ┌──────────────┐  ┌──────────────┐  │
+│ │ Our Location │  │ Your Location│  │
+│ │    [Selected]│  │              │  │
+│ └──────────────┘  └──────────────┘  │
+│                                       │
+│ [If Our Location Selected:]           │
+│ ┌────────────────────────────────┐  │
+│ │ Meeting at:                     │  │
+│ │ Ebkar – Technology &            │  │
+│ │ Management Solutions            │  │
+│ │ Dubai, UAE                      │  │
+│ └────────────────────────────────┘  │
+│                                       │
+│ [If Your Location Selected:]          │
+│ Location:  [___________________]  *  │
+│ Street:    [___________________]  *  │
+│ Building:  [___________________]  *  │
+│ Apartment: [___________________]     │
+│                                       │
+│  [← Back]           [Next →]          │
+└──────────────────────────────────────┘
+   ↓
+
+┌──────────────────────────────────────┐
+│ STEP 4: Date & Time Selection         │
+│ ─────────────────────────────────    │
+│                                       │
+│ ┌──────────────┐  ┌──────────────┐  │
+│ │  Calendar    │  │ Time Slots   │  │
+│ │              │  │              │  │
+│ │ Oct 2025     │  │ ┌──────────┐ │  │
+│ │ Mo Tu We Th  │  │ │  09:00   │ │  │
+│ │  1  2  3  4  │  │ ├──────────┤ │  │
+│ │  5  6  7  8  │  │ │  10:00   │ │  │
+│ │  9 10 11 12  │  │ ├──────────┤ │  │
+│ │ 13 14 15 16  │  │ │  11:00   │ │  │
+│ │           [30]│  │ └──────────┘ │  │
+│ └──────────────┘  └──────────────┘  │
+│                                       │
+│ Timezone: [Asia/Dubai ▼]             │
+│ Format: [AM/PM] ⚬───⚫ [24H]         │
+│                                       │
+│  [← Back]      [Schedule Meeting]     │
+└──────────────────────────────────────┘
+   ↓
+
+┌──────────────────────────────────────┐
+│ ✓ Booking Confirmed!                  │
+│                                       │
+│ Your appointment has been scheduled   │
+│                                       │
+│ Details:                              │
+│ • Date: October 30, 2025              │
+│ • Time: 10:00 AM                      │
+│ • Services: IT Consultation,          │
+│            Tech Support               │
+│ • Location: Our Office                │
+│                                       │
+│ Calendar invite sent to your email    │
+│                                       │
+│ [View Appointment] [Reschedule]       │
+└──────────────────────────────────────┘
+
+═══════════════════════════════════════
+
+BACKEND DATA STORAGE
+--------------------
+
+Event Document Created with:
+├── Standard Fields
+│   ├── subject
+│   ├── starts_on
+│   ├── ends_on
+│   └── event_participants
+│
+└── Custom Fields
+    ├── custom_customer_phone: "+971 50 123 4567"
+    ├── custom_selected_services: ["Service-1", "Service-3"]
+    ├── custom_location_type: "our_location"
+    ├── custom_our_location: "Ebkar, Dubai, UAE"
+    └── custom_customer_location: null
+
+═══════════════════════════════════════
+
+TECHNICAL ARCHITECTURE
+----------------------
+
+Frontend Components:
+├── multiStepBooking.tsx (Container)
+│   ├── customerInfoForm.tsx (Step 1)
+│   ├── servicesSelection.tsx (Step 2)
+│   ├── meetingLocation.tsx (Step 3)
+│   └── dateTimeSelection.tsx (Step 4)
+│
+Backend API:
+├── get_appointment_services()
+│   └── Returns: List of active services
+│
+└── book_time_slot()
+    ├── Accepts: All customer data
+    └── Creates: Event with custom fields
+
+Database:
+├── Appointment Service (DocType)
+│   ├── service_name
+│   ├── description
+│   ├── duration
+│   ├── price
+│   └── enabled
+│
+└── Event (Custom Fields)
+    ├── custom_customer_phone
+    ├── custom_selected_services
+    ├── custom_location_type
+    ├── custom_our_location
+    └── custom_customer_location
+
+═══════════════════════════════════════
+

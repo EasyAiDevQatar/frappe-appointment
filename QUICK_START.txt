@@ -1,0 +1,81 @@
+QUICK START GUIDE - New 4-Step Booking Workflow
+================================================
+
+STEP 1: Run Migration
+---------------------
+Choose your site name from the list below and run:
+
+Available sites:
+- amal.local
+- antpos.local
+- etms.local
+- etms-test.local
+- kslsvcs.local
+- mamutea.local
+- pl.local
+- point.local
+- sp.local
+- ury.local
+- yesfresh.local
+
+Command:
+cd /home/rust/erp15
+bench --site [your-site-name] migrate
+bench --site [your-site-name] clear-cache
+bench restart
+
+STEP 2: Create Services
+------------------------
+1. Login to your site
+2. Go to: Desk → Frappe Appointment → Appointment Service
+3. Create new services (examples):
+   
+   Service 1:
+   - Service Name: IT Consultation
+   - Description: Professional IT consultation for business needs
+   - Duration: 60
+   - Price: 500
+   - Enabled: Yes
+   
+   Service 2:
+   - Service Name: System Installation
+   - Description: Complete system setup and installation
+   - Duration: 120
+   - Price: 1000
+   - Enabled: Yes
+
+STEP 3: Test the Booking Flow
+------------------------------
+1. Navigate to your appointment booking URL
+2. Select a meeting duration
+3. Complete the 4-step process:
+   ✓ Page 1: Enter Name, Phone, Email
+   ✓ Page 2: Select Services
+   ✓ Page 3: Choose Location (Our office or Customer location)
+   ✓ Page 4: Pick Date & Time
+4. Confirm booking
+
+STEP 4: Verify
+--------------
+Check the created Event document to see all custom fields populated with:
+- Customer phone number
+- Selected services
+- Location type and details
+
+CUSTOMIZATION
+-------------
+To update your company location:
+Edit: apps/frappe_appointment/frontend/src/pages/appointment/components/meetingLocation.tsx
+Line 60: Change "Ebkar – Technology & Management Solutions, Dubai, UAE" to your address
+
+TROUBLESHOOTING
+---------------
+If frontend doesn't update:
+cd /home/rust/erp15/apps/frappe_appointment/frontend
+npm run build
+cd /home/rust/erp15
+bench --site [your-site-name] clear-website-cache
+bench restart
+
+For more details, see BOOKING_WORKFLOW_CHANGES.md
+

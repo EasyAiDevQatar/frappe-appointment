@@ -140,6 +140,19 @@ def get_time_slots(
     return data
 
 
+@frappe.whitelist(allow_guest=True)
+@add_response_code
+def get_appointment_services():
+    """Get all active appointment services"""
+    services = frappe.get_all(
+        "Appointment Service",
+        filters={"enabled": 1},
+        fields=["name", "service_name", "description", "duration", "price"],
+        order_by="service_name asc"
+    )
+    return services
+
+
 @frappe.whitelist(allow_guest=True, methods=["POST"])
 @add_response_code
 def book_time_slot(
@@ -151,6 +164,11 @@ def book_time_slot(
     user_name: str,
     user_email: str,
     other_participants: str = None,
+    customer_phone: str = None,
+    selected_services: str = None,
+    location_type: str = None,
+    our_location: str = None,
+    customer_location: str = None,
     **args,
 ):
     duration = frappe.get_doc("Appointment Slot Duration", duration_id)
@@ -220,6 +238,18 @@ def book_time_slot(
     args["user_calendar"] = user_availability.name
     args["appointment_slot_duration"] = duration.name
     args["user_slug"] = user_availability.slug
+    
+    # Store custom booking information
+    if customer_phone:
+        args["customer_phone"] = customer_phone
+    if selected_services:
+        args["selected_services"] = selected_services
+    if location_type:
+        args["location_type"] = location_type
+    if our_location:
+        args["our_location"] = our_location
+    if customer_location:
+        args["customer_location"] = customer_location
 
     success_message = ""
 
